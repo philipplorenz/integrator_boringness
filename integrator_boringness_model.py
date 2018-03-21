@@ -27,7 +27,7 @@ size = int(sys.argv[4])
 #length and granularity of the solution
 t_end = 4000.
 t_start = 0.
-t_step = 0.1
+t_step = 1.0
 t_interval = np.arange(t_start, t_end+t_step, t_step)
 #random intital conditions
 y0 = []
@@ -75,7 +75,7 @@ for traj in trajectories:
 	if max(traj) > 0.0:	
 		for j in range(len(traj)-1):
 
-			if j > 1000:
+			if j > 1:
 
 				if j != 0 and traj[j-1] > 0.0 and traj[j+1] > 0.0:
 				
@@ -85,11 +85,11 @@ for traj in trajectories:
 					final_list_reverse[j/1].append([i, traj[j], change_reverse])
 
 #save data using pickle in various files
-with open("./trajectory_simulated_{0}.txt".format(d), "wb") as fp:   #Pickling
+with open("./trajectory_simulated_{0}.txt".format(r), "wb") as fp:   #Pickling
 	pickle.dump(trajectories[:], fp)
-with open("./plotdata_simulated_{0}.txt".format(d), "wb") as fp:   #Pickling
+with open("./plotdata_simulated_{0}.txt".format(r), "wb") as fp:   #Pickling
 	pickle.dump(final_list[:], fp)
-with open("./plotdata_simulated_reverse_{0}.txt".format(d), "wb") as fp:   #Pickling
+with open("./plotdata_simulated_reverse_{0}.txt".format(r), "wb") as fp:   #Pickling
 	pickle.dump(final_list_reverse[:], fp)
 
 
