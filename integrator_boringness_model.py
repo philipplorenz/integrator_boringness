@@ -25,7 +25,7 @@ c = float(sys.argv[2])
 r = float(sys.argv[3])
 size = int(sys.argv[4])
 #length and granularity of the solution
-t_end = 4000.
+t_end = 5000.
 t_start = 0.
 t_step = 1.0
 t_interval = np.arange(t_start, t_end+t_step, t_step)
@@ -33,7 +33,7 @@ t_interval = np.arange(t_start, t_end+t_step, t_step)
 y0 = []
 for i in range(size):
 
-	y0.append(0.01*np.random.random())
+	y0.append(np.random.random())
 	y0.append(0.0)
 #setting up the integrator
 ode = scipy.integrate.ode(system)
@@ -56,12 +56,12 @@ trajectories = []
 for i in range(len(y0)/2):
 	
 	traj1 = [s[i*2] for s in sol]
-	plt.plot(traj1, lw=3)
 	traj = []
-	for t in range(len(traj1)):
+	for t in range(1000, len(traj1)):
 		if t%(1.0/t_step) == 0:
 			traj.append(sum(traj1[t:t+int(1.0/t_step)]))
 	trajectories.append(traj)
+	plt.plot(traj, lw=3)
 
 plt.xlabel('$t$', fontsize=20)
 plt.ylabel('$L_i(t)$', fontsize=20)
