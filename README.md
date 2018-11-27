@@ -4,3 +4,9 @@ A simple script for solving the system of ODEs of the boringness model numerical
 ## Usage:
 
 `python integrator_boringness_model.py a c r N`
+
+## Example output
+
+![alt text](https://raw.githubusercontent.com/philipplorenz/integrator_boringness/master/output1.png)
+
+![alt text](https://raw.githubusercontent.com/philipplorenz/integrator_boringness/master/output2.png)
