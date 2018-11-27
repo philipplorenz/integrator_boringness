@@ -25,8 +25,8 @@ def f(t, y, params):
 # Parameters
 a = float(sys.argv[1]) #0.005
 c = float(sys.argv[2]) #2.4
-r = float(sys.argv[3]) #12.0
-size = int(sys.argv[4]) #300
+r = float(sys.argv[3]) #11.0
+size = int(sys.argv[4]) #100
 
 x_new = []
 
@@ -71,7 +71,7 @@ for trial in range(1):
 	traj_list = []
 	for i in range(size):
 		traj_list.append(psoln[:,i])
-		plt.plot(psoln[:,i][500:])	#ignore the first 500 steps
+		plt.plot(psoln[:,i][:])	
 
 	for step in range(20, len(psoln[:,i])):
 		
@@ -94,7 +94,7 @@ data = pd.Series(x_new)
 # Plot for comparison
 ax = data.plot(kind='hist', normed=True, alpha=0.3, label='Simulation', color='red', loglog=True, bins=np.logspace(np.log10(min(x_new)),np.log10(max(x_new)), 50))
 
-with open("../Sunes_twitter/twittertags_relative_top10_full_2016_daily_allyear.txt", "rb") as fp:   # Unpickling
+with open("./example_data_twitter_2016.txt", "rb") as fp:   # Unpickling
     b = pickle.load(fp)
 x_new2=[]
 for relhype in b:
