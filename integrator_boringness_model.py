@@ -10,13 +10,13 @@ import scipy.integrate
 def f(t, y, params):
     L = y[:len(y)/2]
     Y = y[len(y)/2:]
-    a, c, r = params  # unpack parameters
+    a, c, r, L_inf = params  # unpack parameters
     
     l_sum = sum(L)
     dL = []
     dY = []
     for i in range(len(L)):
-	dL.append(r*L[i]*(1.0 - (r*Y[i] + c*(l_sum-L[i]))))
+	dL.append(r*L[i]*(1.0 - ((r/L_inf)*Y[i] + c*(l_sum-L[i]))))
         dY.append(L[i] - a*Y[i])
 	
     derivs = dL + dY
@@ -26,11 +26,13 @@ def f(t, y, params):
 a = float(sys.argv[1]) #0.005
 c = float(sys.argv[2]) #2.4
 r = float(sys.argv[3]) #11.0
-size = int(sys.argv[4]) #100
+L_inf = float(sys.argv[4]) #1.0
+size = int(sys.argv[5]) #300
 
-x_new = []
+rel_changes = []
+log_changes = []
 
-for trial in range(1):
+for trial in range(5):
 
 	L = []
 	Y = []
@@ -40,7 +42,7 @@ for trial in range(1):
 		Y.append(0.0)     		# initial memories
 
 	# Bundle parameters for ODE solver
-	params = [a, c, r]
+	params = [a, c, r, L_inf]
 
 	# Bundle initial conditions for ODE solver
 	y0 = L + Y
@@ -70,23 +72,30 @@ for trial in range(1):
 	
 	traj_list = []
 	for i in range(size):
-		traj_list.append(psoln[:,i])
-		plt.plot(psoln[:,i][:])	
+		traj_list.append(list(psoln[:,i]))
+		plt.plot(psoln[:,i][10000:])	
 
-	for step in range(20, len(psoln[:,i])):
+	for step in range(10000, len(psoln[:,i])):
 		
-		traj_list.sort(key=lambda x: x[step], reverse=True)
 		if step%20 ==0:		
 
-			for traj in traj_list[:20]:
+			for traj in traj_list[:]:
 			
 				#relative_change = traj[step]
-				relative_change = (traj[step-20] - traj[step])/traj[step]
+				relative_change = (traj[step] - traj[step-20])/traj[step-20]
 				if relative_change > 0.00:
-		    			x_new.append(relative_change)
+		    			rel_changes.append(relative_change)
+				if traj[step-20] > 0:
+					log_changes.append(np.log(traj[step]/traj[step-20]))
 
-#with open("./relative_change_data_{0}.json".format(r), "wb") as fp:   #Pickling
-#	json.dump(x_new[:], fp)
+with open("./trajectory_{0}.json".format(r), "wb") as fp:   #Pickling
+	json.dump(list(traj_list), fp)
+
+with open("./relative_change_data_{0}.json".format(r), "wb") as fp:   #Pickling
+	json.dump(rel_changes[:], fp)
+
+with open("./logarithmic_change_data_{0}.json".format(r), "wb") as fp:   #Pickling
+	json.dump(rel_changes[:], fp)
 
 plt.show()
 
