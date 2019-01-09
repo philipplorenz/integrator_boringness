@@ -32,7 +32,7 @@ size = int(sys.argv[5]) #300
 rel_changes = []
 log_changes = []
 
-for trial in range(5):
+for trial in range(1):
 
 	L = []
 	Y = []
@@ -81,27 +81,27 @@ for trial in range(5):
 
 			for traj in traj_list[:]:
 			
-				#relative_change = traj[step]
 				relative_change = (traj[step] - traj[step-20])/traj[step-20]
 				if relative_change > 0.00:
 		    			rel_changes.append(relative_change)
-				if traj[step-20] > 0:
-					log_changes.append(np.log(traj[step]/traj[step-20]))
+				#if traj[step-20] > 0:
+				#	log_changes.append(np.log(traj[step]/traj[step-20]))
 
-with open("./trajectory_{0}.json".format(r), "wb") as fp:   #Pickling
-	json.dump(list(traj_list), fp)
+#with open("./trajectory_{0}.json".format(r), "wb") as fp:   #Pickling
+#	json.dump(list(traj_list), fp)
 
-with open("./relative_change_data_{0}.json".format(r), "wb") as fp:   #Pickling
-	json.dump(rel_changes[:], fp)
+#with open("./relative_change_data_{0}.json".format(r), "wb") as fp:   #Pickling
+#	json.dump(rel_changes[:], fp)
 
-with open("./logarithmic_change_data_{0}.json".format(r), "wb") as fp:   #Pickling
-	json.dump(rel_changes[:], fp)
+#with open("./logarithmic_change_data_{0}.json".format(r), "wb") as fp:   #Pickling
+#	json.dump(log_changes[:], fp)
 
+plt.xlim(28000, 30000)
 plt.show()
 
-data = pd.Series(x_new)
+data = pd.Series(rel_changes)
 # Plot for comparison
-ax = data.plot(kind='hist', normed=True, alpha=0.3, label='Simulation', color='red', loglog=True, bins=np.logspace(np.log10(min(x_new)),np.log10(max(x_new)), 50))
+ax = data.plot(kind='hist', normed=True, alpha=0.3, label='Simulation', color='red', loglog=True, bins=np.logspace(np.log10(min(rel_changes)),np.log10(max(rel_changes)), 50))
 
 with open("./example_data_twitter_2016.txt", "rb") as fp:   # Unpickling
     b = pickle.load(fp)
