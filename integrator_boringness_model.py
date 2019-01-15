@@ -10,13 +10,13 @@ import scipy.integrate
 def f(t, y, params):
     L = y[:len(y)/2]
     Y = y[len(y)/2:]
-    a, c, r, L_inf = params  # unpack parameters
+    a, c, r, K = params  # unpack parameters
     
     l_sum = sum(L)
     dL = []
     dY = []
     for i in range(len(L)):
-	dL.append(r*L[i]*(1.0 - ((r/L_inf)*Y[i] + c*(l_sum-L[i]))))
+	dL.append(r*L[i]*(1.0 - ((r/K)*Y[i] + c*(l_sum-L[i]))))
         dY.append(L[i] - a*Y[i])
 	
     derivs = dL + dY
@@ -26,7 +26,7 @@ def f(t, y, params):
 a = float(sys.argv[1]) #0.005
 c = float(sys.argv[2]) #2.4
 r = float(sys.argv[3]) #11.0
-L_inf = float(sys.argv[4]) #1.0
+K = float(sys.argv[4]) #1.0
 size = int(sys.argv[5]) #300
 
 rel_changes = []
@@ -42,7 +42,7 @@ for trial in range(1):
 		Y.append(0.0)     		# initial memories
 
 	# Bundle parameters for ODE solver
-	params = [a, c, r, L_inf]
+	params = [a, c, r, K]
 
 	# Bundle initial conditions for ODE solver
 	y0 = L + Y
@@ -84,8 +84,8 @@ for trial in range(1):
 				relative_change = (traj[step] - traj[step-20])/traj[step-20]
 				if relative_change > 0.00:
 		    			rel_changes.append(relative_change)
-				#if traj[step-20] > 0:
-				#	log_changes.append(np.log(traj[step]/traj[step-20]))
+				if traj[step-20] > 0:
+					log_changes.append(np.log(traj[step]/traj[step-20]))
 
 #with open("./trajectory_{0}.json".format(r), "wb") as fp:   #Pickling
 #	json.dump(list(traj_list), fp)
