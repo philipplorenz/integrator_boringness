@@ -3,7 +3,7 @@ A simple script for solving the system of ODEs of the boringness model numerical
 
 ## Usage:
 
-`python integrator_boringness_model.py a c r N`
+`python integrator_boringness_model.py alpha c r K N`
 
 ## Example output
 
