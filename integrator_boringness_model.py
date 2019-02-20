@@ -7,16 +7,17 @@ import json
 import pickle
 import scipy.integrate
 
+# system definition
 def f(t, y, params):
-    L = y[:len(y)/2]
-    Y = y[len(y)/2:]
+    L = y[:int(len(y)/2)]
+    Y = y[int(len(y)/2):]
     a, c, r, K = params  # unpack parameters
     
     l_sum = sum(L)
     dL = []
     dY = []
     for i in range(len(L)):
-	dL.append(r*L[i]*(1.0 - ((r/K)*Y[i] + c*(l_sum-L[i]))))
+        dL.append(r*L[i]*(1.0 - ((r/K)*Y[i] + c*(l_sum-L[i]))))
         dY.append(L[i] - a*Y[i])
 	
     derivs = dL + dY
@@ -32,6 +33,7 @@ size = int(sys.argv[5]) #300
 rel_changes = []
 log_changes = []
 
+# loop for esemble averaging (ergodicity not certain)
 for trial in range(1):
 
 	L = []
@@ -59,7 +61,7 @@ for trial in range(1):
 	ode.set_integrator('dopri5')
 	ode.set_initial_value(y0, 0.0).set_f_params(params)
 
-	#running the solver
+	# running the solver
 	ts = []
 	psoln = []
 	while ode.successful() and ode.t < tStop:
@@ -70,11 +72,13 @@ for trial in range(1):
 	t = np.vstack(ts)
 	psoln = np.array(psoln)		
 	
+	# plot the raw dynamics for visualization
 	traj_list = []
 	for i in range(size):
 		traj_list.append(list(psoln[:,i]))
 		plt.plot(psoln[:,i][10000:])	
 
+	# calculate the relative changes (gains)
 	for step in range(10000, len(psoln[:,i])):
 		
 		if step%20 ==0:		
@@ -84,24 +88,14 @@ for trial in range(1):
 				relative_change = (traj[step] - traj[step-20])/traj[step-20]
 				if relative_change > 0.00:
 		    			rel_changes.append(relative_change)
-				if traj[step-20] > 0:
-					log_changes.append(np.log(traj[step]/traj[step-20]))
 
-#with open("./trajectory_{0}.json".format(r), "wb") as fp:   #Pickling
-#	json.dump(list(traj_list), fp)
-
-#with open("./relative_change_data_{0}.json".format(r), "wb") as fp:   #Pickling
-#	json.dump(rel_changes[:], fp)
-
-#with open("./logarithmic_change_data_{0}.json".format(r), "wb") as fp:   #Pickling
-#	json.dump(log_changes[:], fp)
-
+# show dynamics (zoomed)
 plt.xlim(28000, 30000)
 plt.show()
 
 data = pd.Series(rel_changes)
-# Plot for comparison
-ax = data.plot(kind='hist', normed=True, alpha=0.3, label='Simulation', color='red', loglog=True, bins=np.logspace(np.log10(min(rel_changes)),np.log10(max(rel_changes)), 50))
+# plot histogram for comparisonwith empirical data
+ax = data.plot(kind='hist', density=True, alpha=0.3, label='Simulation', color='red', loglog=True, bins=np.logspace(np.log10(min(rel_changes)),np.log10(max(rel_changes)), 50))
 
 with open("./example_data_twitter_2016.txt", "rb") as fp:   # Unpickling
     b = pickle.load(fp)
@@ -111,6 +105,6 @@ for relhype in b:
             x_new2.append(abs(relhype))
 
 data2 = pd.Series(x_new2)
-ax = data2.plot(kind='hist', normed=True, alpha=0.3, label='Data', color='black', loglog=True, bins=np.logspace(np.log10(min(x_new2)),np.log10(max(x_new2)), 50))
+ax = data2.plot(kind='hist', density=True, alpha=0.3, label='Data', color='black', loglog=True, bins=np.logspace(np.log10(min(x_new2)),np.log10(max(x_new2)), 50))
 plt.legend()
 plt.show()
