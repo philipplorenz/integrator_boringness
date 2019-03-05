@@ -26,7 +26,7 @@ def f(t, y, params):
 # Parameters
 a = float(sys.argv[1]) #0.005
 c = float(sys.argv[2]) #2.4
-r = float(sys.argv[3]) #11.0
+r = float(sys.argv[3]) #12.0
 K = float(sys.argv[4]) #1.0
 size = int(sys.argv[5]) #300
 
@@ -73,19 +73,22 @@ for trial in range(1):
 	psoln = np.array(psoln)		
 	
 	# plot the raw dynamics for visualization
+    # ignore the intitial 500 timesteps
 	traj_list = []
 	for i in range(size):
 		traj_list.append(list(psoln[:,i]))
-		plt.plot(psoln[:,i][10000:])	
+		plt.plot(psoln[:,i][int(500./tInc):])	
 
 	# calculate the relative changes (gains)
-	for step in range(10000, len(psoln[:,i])):
+	for step in range(int(500./tInc), len(psoln[:,i])):
 		
-		if step%20 ==0:		
+		if step%(1./tInc) ==0:		
 
 			for traj in traj_list[:]:
-			
-				relative_change = (traj[step] - traj[step-20])/traj[step-20]
+			    # collect relative gains
+				relative_change = (traj[step] - traj[step-int(1./tInc)])/traj[step-int(1./tInc)]
+                # use this to collect relative losses
+				#relative_change = (traj[step] - traj[step+1./tInc])/traj[step+1./tInc]
 				if relative_change > 0.00:
 		    			rel_changes.append(relative_change)
 
