@@ -19,7 +19,7 @@ def f(t, y, params):
     for i in range(len(L)):
         dL.append(r*L[i]*(1.0 - ((r/K)*Y[i] + c*(l_sum-L[i]))))
         dY.append(L[i] - a*Y[i])
-	
+    
     derivs = dL + dY
     return derivs
 
@@ -36,61 +36,62 @@ log_changes = []
 # loop for esemble averaging (ergodicity not certain)
 for trial in range(1):
 
-	L = []
-	Y = []
-	# Initial values
-	for i in range(size):
-		L.append(np.random.random())	# initial values
-		Y.append(0.0)     		# initial memories
+    L = []
+    Y = []
+    # Initial values
+    for i in range(size):
+        L.append(np.random.random())    # initial values
+        Y.append(0.0)             # initial memories
 
-	# Bundle parameters for ODE solver
-	params = [a, c, r, K]
+    # Bundle parameters for ODE solver
+    params = [a, c, r, K]
 
-	# Bundle initial conditions for ODE solver
-	y0 = L + Y
+    # Bundle initial conditions for ODE solver
+    y0 = L + Y
 
-	# Make time array for solution
-	tStop = 2000
-	tInc = 0.05	
-	t = np.arange(0., tStop, tInc)
+    # Make time array for solution
+    tStop = 2000
+    tInc = 0.05    
+    t = np.arange(0., tStop, tInc)
 
-	# Call the ODE solver
-	#psoln = odeint(f, y0, t, args=(params,))
+    # Call the ODE solver
+    #psoln = odeint(f, y0, t, args=(params,))
 
-	ode = scipy.integrate.ode(f)
-	ode.set_integrator('dopri5')
-	ode.set_initial_value(y0, 0.0).set_f_params(params)
+    ode = scipy.integrate.ode(f)
+    ode.set_integrator('dopri5')
+    ode.set_initial_value(y0, 0.0).set_f_params(params)
 
-	# running the solver
-	ts = []
-	psoln = []
-	while ode.successful() and ode.t < tStop:
-		ode.integrate(ode.t + tInc)
-		ts.append(ode.t)
-		psoln.append(ode.y)
+    # running the solver
+    ts = []
+    psoln = []
+    while ode.successful() and ode.t < tStop:
+        ode.integrate(ode.t + tInc)
+        ts.append(ode.t)
+        psoln.append(ode.y)
 
-	t = np.vstack(ts)
-	psoln = np.array(psoln)		
-	
-	# plot the raw dynamics for visualization
+    t = np.vstack(ts)
+    psoln = np.array(psoln)        
+    
+    # plot the raw dynamics for visualization
     # ignore the intitial 500 timesteps
-	traj_list = []
-	for i in range(size):
-		traj_list.append(list(psoln[:,i]))
-		plt.plot(psoln[:,i][int(500./tInc):])	
+    traj_list = []
+    for i in range(size):
+        traj_list.append(list(psoln[:,i]))
+        plt.plot(psoln[:,i][int(500./tInc):])    
 
-	# calculate the relative changes (gains)
-	for step in range(int(500./tInc), len(psoln[:,i])):
-		
-		if step%(1./tInc) ==0:		
+    # calculate the relative changes (gains)
+    for step in range(int(500./tInc), len(psoln[:,i])):
 
-			for traj in traj_list[:]:
-			    # collect relative gains
-				relative_change = (traj[step] - traj[step-int(1./tInc)])/traj[step-int(1./tInc)]
-                # use this to collect relative losses
-				#relative_change = (traj[step] - traj[step+1./tInc])/traj[step+1./tInc]
-				if relative_change > 0.00:
-		    			rel_changes.append(relative_change)
+        if step%(1./tInc) ==0:        
+
+            for traj in traj_list[:]:
+                # collect relative gains
+                if traj[step-int(1./tInc)] > 0:
+                    relative_change = (traj[step] - traj[step-int(1./tInc)])/traj[step-int(1./tInc)]
+                    # use this to collect relative losses
+                    #relative_change = (traj[step] - traj[step+1./tInc])/traj[step+1./tInc]
+                    if relative_change > 0.00:
+                        rel_changes.append(relative_change)
 
 # show dynamics (zoomed)
 plt.xlim(28000, 30000)
@@ -104,7 +105,7 @@ with open("./example_data_twitter_2016.txt", "rb") as fp:   # Unpickling
     b = pickle.load(fp)
 x_new2=[]
 for relhype in b:
-	if relhype > 0.00:
+    if relhype > 0.00:
             x_new2.append(abs(relhype))
 
 data2 = pd.Series(x_new2)
